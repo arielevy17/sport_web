@@ -1,5 +1,8 @@
 import React from "react";
 import axios from "axios";
+
+const INITIALIZING_COUNTERS=0;
+
 class ResultHistory extends React.Component{
         state={
             results:[],
@@ -7,7 +10,8 @@ class ResultHistory extends React.Component{
             minRound:null,
             helpMaxRound:null,
             maxRound:null,
-            roundsNumbers:[]
+            roundsNumbers:[],
+            errorRange:false
         }
 
     currencyMinChange = (event) => {
@@ -26,34 +30,47 @@ class ResultHistory extends React.Component{
         showGamesResult= (props)=> {
             debugger
             axios.get('https://app.seker.live/fm1/history/'+props.ligId)
-                .then((response) =>{
-                    let homeCounter=0;
-                    let awayCounter=0;
+                .then((response) => {
+                    let homeCounter = INITIALIZING_COUNTERS;
+                    let awayCounter = INITIALIZING_COUNTERS;
                     let currentResults = this.state.results
-                    for (let i=0;i<response.data.length;i++){
-                        response.data[i].goals.map((goal) =>{
-                            goal.home?
-                                homeCounter++ : awayCounter++
-                        })
-                        currentResults[i]= response.data[i].homeTeam.name+" - "+homeCounter+"               "
-                            +response.data[i].awayTeam.name+" - "+awayCounter;
-                        homeCounter=0;
-                        awayCounter=0;
-                    }
-                    this.setState({
-                        results : currentResults,
-                        propsId: props.ligId,
-                        helpMaxRound : response.data[response.data.length-1].round,
-                    })
-                    let currencyRoundsNumbers=this.state.roundsNumbers
-                    for (let i=1; i<=this.state.helpMaxRound; i++) {
-                    currencyRoundsNumbers[i]=i;
-                    }
+                    for (let i = 0; i < response.data.length; i++) {
+                        if (this.state.minRound > this.state.maxRound) {
+                            this.setState({
+                                errorRange:true
+                            })
+
+                        }
+                        else {
+                            this.setState({
+                                errorRange:false
+                            })
+                            if (response.data[i].round >= this.state.minRound && response.data[i].round <= this.state.maxRound) {
+                                response.data[i].goals.map((goalInRange) => {
+                                    goalInRange.home ?
+                                        homeCounter++ : awayCounter++
+                                })
+                                currentResults[i] = response.data[i].homeTeam.name + "  " + homeCounter + "       -        " +
+                                awayCounter  + "  "  + response.data[i].awayTeam.name
+                                homeCounter = 0;
+                                awayCounter = 0;
+                            }
+                        }
+                        }
                         this.setState({
-                            roundsNumbers : currencyRoundsNumbers
+                            results: currentResults,
+                            propsId: props.ligId,
                         })
-                })
-        }
+                        let currencyRoundsNumbers = this.state.roundsNumbers
+                        for (let j = 0; j <= response.data[response.data.length-1].round; j++) {
+                            currencyRoundsNumbers[j] = j;
+                        }
+                        this.setState({
+                            roundsNumbers: currencyRoundsNumbers
+                        })
+                    }
+                )}
+
 
         render() {
             return(
@@ -75,6 +92,12 @@ class ResultHistory extends React.Component{
                             )
                         })}
                     </select>
+                    {this.state.errorRange?
+                        <label style={{color: "red"}}>
+                            <br/>
+                            **The max round have to be biger then the min round</label> :
+                        null
+                    }
                     {
                         this.showGamesResult(this.props)
                     }

@@ -1,6 +1,8 @@
 import React from "react";
 import axios from "axios";
-import ResultHistory from "./ResultHistory";
+
+const DIFFERENCE_FROM_ARRAY_INDEX=1;
+const MARGIN_SIZE=150;
 
 class Tables extends React.Component{
   state={
@@ -17,15 +19,19 @@ class Tables extends React.Component{
             .then((response) => {
                 let currentTeamName=this.state.teamsName;
                 let currentTeamId=this.state.teamsId;
+                let clearList=[];
 
                 for (let i=0;i<response.data.length;i++) {
                     currentTeamName[i] = (response.data[i].name)
                     currentTeamId[i] = (response.data[i].id)
                 }
+
                 this.setState({
                     teamsName: currentTeamName,
                     teamsId: currentTeamId,
                     propsId: props.ligId,
+                    players:clearList,
+                    teamResults:clearList
                 })
 
             })
@@ -79,7 +85,9 @@ class Tables extends React.Component{
       return(
           <div>
               League Table
-              {this.showTable(this.props)}
+              {
+                  <button onClick= {() => this.showTable(this.props)} >Submit</button>
+              }
               <table>
                   {
                       this.state.teamsName.map((team, position) => {
@@ -88,11 +96,12 @@ class Tables extends React.Component{
                                   {
                                       <td>
                                           <button // באג-מתרנדר אינסופית + מופיע לפני שנלחצה הקבוצה
-                                         onClick={this.getPlayers(this.state.teamsId[this.state.teamsName.indexOf(team)])}
-                                             onClick={this.showTeamResults(this.state.teamsId[this.state.teamsName.indexOf(team)])}
-                                          >
+                                              onClick={(()=>{this.getPlayers(this.state.teamsId[this.state.teamsName.indexOf(team)]);
+                                                  this.showTeamResults(this.state.teamsId[this.state.teamsName.indexOf(team)])}
+                                              )}
+                                             >
                                               {
-                                                  (position + 1) + ". " + team
+                                                  (position + DIFFERENCE_FROM_ARRAY_INDEX) + ". " + team
                                               }
                                           </button>
 
@@ -103,7 +112,7 @@ class Tables extends React.Component{
                       })
                   }
               </table>
-              <div style={{marginLeft: 150, fontWeight: "bold", fontSize: "20px", color: "orange"}}>
+              <div style={{marginLeft: MARGIN_SIZE, fontWeight: "bold", fontSize: "20px", color: "orange"}}>
                   Team Players:
                   {
                       this.state.players.map((player) => {
@@ -121,7 +130,7 @@ class Tables extends React.Component{
                       })
                   }
               </div>
-              <div style={{marginLeft: 150, fontWeight: "bold", fontSize: "20px", color:"silver"}}>
+              <div style={{marginLeft: MARGIN_SIZE, fontWeight: "bold", fontSize: "20px", color:"silver"}}>
                   Team Results:
                   {
                       this.state.teamResults.map((gameResult) =>{

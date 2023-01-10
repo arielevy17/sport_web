@@ -1,5 +1,8 @@
 import React from "react";
 import axios from "axios";
+
+const DIFFERENCE_FROM_ARRAY_INDEX=1;
+
 import {BrowserRouter,Routes,Route,NavLink} from "react-router-dom";
 import Tables from "./Tables";
 import Statistic from "./Statistic";
@@ -36,6 +39,7 @@ class App extends React.Component {
     }
 
 
+
     showLeagues = () => {
         axios.get('https://app.seker.live/fm1/leagues/')
             .then((response) => {
@@ -53,7 +57,7 @@ class App extends React.Component {
     render() {
         return (
             <div className={"App"}>
-                { //באג ברינדור של הליגה מתוך העמוד לכן אני לא מאפשר לרנדר מתוך העמוד אלה רק כניסה מחודשת לעמוד (פוגם ב- single page aplication)
+                { //  באג ברינדור של הליגה מתוך העמוד לכן אני לא מאפשר לרנדר מתוך העמוד אלה רק כניסה מחודשת לעמוד (פוגם ב- single page aplication)
                     this.state.loader ? // ממתין עד שהמידע מהשרת מגיע
                         <div> please wait... </div>
                         :
@@ -71,20 +75,21 @@ class App extends React.Component {
                             <BrowserRouter>
                                 <Routes>
                                     <Route path={"/tables"} element={<Tables
-                                        ligId={this.state.leagues.indexOf(this.state.currency) + 1}/>}/>
+                                        ligId={this.state.leagues.indexOf(this.state.currency) + DIFFERENCE_FROM_ARRAY_INDEX}/>}/>
                                     <Route path={"/statistic"} element={<Statistic/>}/>
                                     <Route path={"/result-history"} element={<ResultHistory
-                                        ligId={this.state.leagues.indexOf(this.state.currency) + 1}/>}/>
-                                    <Route path={"/scorers"} element={<Scorers/>}/>
+                                        ligId={this.state.leagues.indexOf(this.state.currency) + DIFFERENCE_FROM_ARRAY_INDEX}/>}/>
+                                    <Route path={"/scorers"} element={<Scorers
+                                        ligId={this.state.leagues.indexOf(this.state.currency) + DIFFERENCE_FROM_ARRAY_INDEX}/>}/>
                                 </Routes>
                             </BrowserRouter>
                             {
-                                this.state.disableButton ? // מעלים את תיבת בחירת הליגה לאחר בחירת ליגה בגלל הבאג ברינדטר הליגה
+                                // מעלים את תיבת בחירת הליגה לאחר בחירת ליגה בגלל הבאג ברינדטר הליגה
                                     <div>
                                         <label> Select your league </label>
                                         <br/>
                                         <select onClick={this.leagueWasSelected} value={this.state.currency} onChange={this.currencyChange}>
-                                            <option  value={"none"}> Press Your League</option>
+                                            <option disabled={true} value={"none"}> Press Your League</option>
                                             {
                                                 this.state.leagues.map((item) => {
                                                 return (
@@ -93,7 +98,7 @@ class App extends React.Component {
                                             })}
                                         </select>
                                     </div>
-                                    : null
+
                             }
 
                         </div>
