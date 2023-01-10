@@ -1,13 +1,12 @@
 import React from "react";
 import axios from "axios";
-
-const DIFFERENCE_FROM_ARRAY_INDEX=1;
-
 import {BrowserRouter,Routes,Route,NavLink} from "react-router-dom";
 import Tables from "./Tables";
 import Statistic from "./Statistic";
 import ResultHistory from "./ResultHistory";
 import Scorers from "./Scorers";
+
+const DIFFERENCE_FROM_ARRAY_INDEX=1;
 
 
 class App extends React.Component {
